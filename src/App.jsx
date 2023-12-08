@@ -4,7 +4,7 @@ import Navbar from './components/shared/Navbar';
 
 function App() {
   return (
-    <div className="flex h-screen flex-col">
+    <div className="relative flex h-screen w-full flex-col">
       <Outlet />
       <Navbar />
     </div>

@@ -22,11 +22,20 @@
     "no-unused-vars": "off",
     "react-hooks/exhaustive-deps": "warn",
     "react/jsx-filename-extension": [
-      0,
+      1,
       {
         "extensions": [".js", ".jsx"]
       }
     ],
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "react/button-has-type": "off",
+    "react/jsx-no-bind": "off",
+    "import/prefer-default-export": "off",
+    "consistent-return": "off",
+    "prefer-query-object-syntax": "off",
+    "class-methods-use-this": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
+    "no-shadow": "off"
   }
 }
