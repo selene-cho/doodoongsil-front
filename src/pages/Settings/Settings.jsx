@@ -1,10 +1,10 @@
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { TbClipboardText, TbBell, TbCalendar, TbEdit } from 'react-icons/tb';
 import { BiUser } from 'react-icons/bi';
 
-import { Link, useNavigate } from 'react-router-dom';
-
-import { getUserInfo } from '../../lib/api/userApi';
+import { getUserInfo, updateUserStartWeek } from '../../lib/api/userApi';
 import Header from '../../components/shared/Header';
 import Button from '../../components/shared/Button';
 import Modal from '../../components/shared/Modal';
@@ -17,10 +17,17 @@ export default function Settings() {
     queryFn: () => getUserInfo(),
   });
 
-  if (error) {
-    navigate('/notfound');
-    return;
-  }
+  const [startWeek, setStartWeek] = useState('');
+
+  useEffect(() => {
+    if (error) {
+      navigate('/notfound');
+    }
+
+    if (data?.user?.startWeek) {
+      setStartWeek(data.user.startWeek);
+    }
+  }, [data, error, navigate]);
 
   if (isLoading || !data) {
     return (
@@ -31,6 +38,16 @@ export default function Settings() {
   }
 
   const { user } = data;
+
+  async function handleStartWeekChange(day) {
+    try {
+      await updateUserStartWeek(day);
+
+      setStartWeek(day);
+    } catch (err) {
+      console.err(error);
+    }
+  }
 
   return (
     <>
@@ -136,10 +153,24 @@ export default function Settings() {
             <span className="font-bold">한 주의 시작</span>
           </div>
           <div className="mx-5 flex items-center justify-between gap-3 text-sm">
-            <Button className="w-20 border border-blue-400 bg-blue-100 px-5 text-xs font-bold text-blue-400">
+            <Button
+              onClick={() => handleStartWeekChange('일')}
+              className={`w-20 border px-5 text-xs font-bold ${
+                startWeek === '일'
+                  ? 'border-blue-400 bg-blue-100 text-blue-400'
+                  : 'border-slate-400 bg-slate-100 text-slate-400'
+              }`}
+            >
               일요일
             </Button>
-            <Button className="w-20 border border-slate-400 bg-slate-100 px-5 text-xs font-bold text-slate-400">
+            <Button
+              onClick={() => handleStartWeekChange('월')}
+              className={`w-20 border  px-5 text-xs font-bold ${
+                startWeek === '월'
+                  ? 'border-blue-400 bg-blue-100 text-blue-400'
+                  : 'border-slate-400 bg-slate-100 text-slate-400'
+              }`}
+            >
               월요일
             </Button>
           </div>

@@ -15,3 +15,17 @@ export async function updateUserInfo(userInfo) {
 
   return res.data;
 }
+
+export async function updateUserStartWeek(startWeek) {
+  try {
+    const res = await instance.patch(
+      '/user/startWeek',
+      { startWeek },
+      { headers: { 'Content-Type': 'application/json' } },
+    );
+
+    return res.data;
+  } catch (err) {
+    console.error(err);
+  }
+}
