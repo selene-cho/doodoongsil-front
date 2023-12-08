@@ -5,6 +5,7 @@ import Button from '../components/shared/Button';
 
 export default function Login() {
   const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_KAKAO_REDIRECT_URI}`;
+
   function onClick() {
     window.location.href = KAKAO_AUTH_URL;
   }
