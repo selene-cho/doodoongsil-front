@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TbClipboardText, TbBell, TbCalendar, TbEdit } from 'react-icons/tb';
 import { BiUser } from 'react-icons/bi';
 
@@ -12,6 +12,7 @@ import Loading from '../../components/shared/Loading';
 
 export default function Settings() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery({
     queryKey: ['userInfo'],
     queryFn: () => getUserInfo(),
@@ -44,6 +45,13 @@ export default function Settings() {
       await updateUserStartWeek(day);
 
       setStartWeek(day);
+
+      queryClient.setQueryData(['userInfo'], (prev) => {
+        return {
+          ...prev,
+          user: { ...prev.user, startWeek: day },
+        };
+      });
     } catch (err) {
       console.err(error);
     }
