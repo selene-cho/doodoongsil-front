@@ -61,20 +61,6 @@ export default function Main() {
             <TbUpload />
             <TbListDetails />
           </div>
-          {/* <div className="">
-            <Button onClick={handleMonthSelect} className="text-center">
-              2023년 12월
-              <TbCaretDownFilled />
-            </Button>
-            <div className="gid grid-cols-7 gap-2">
-              {WEEKS.map((day) => (
-                <div key={day} className="text-center">
-                  {day}
-                </div>
-              ))}
-              {[...Array]}
-            </div>
-          </div> */}
           <Calendar />
         </section>
         <section>
@@ -83,7 +69,12 @@ export default function Main() {
             <TbTrash />
           </div>
           <div className="mx-5 my-3 rounded-md border border-indigo-200">
-            <div className="">오늘의 일기</div>
+            <div className="">
+              <div>감정아이콘</div>
+              <div>세부행동 아이콘</div>
+              <div>일기</div>
+              <div>사진</div>
+            </div>
           </div>
         </section>
       </div>

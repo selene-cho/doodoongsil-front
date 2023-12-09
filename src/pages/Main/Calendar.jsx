@@ -1,85 +1,104 @@
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   getMonth,
   getYear,
   eachDayOfInterval,
   startOfWeek,
+  startOfMonth,
   endOfMonth,
   format,
+  isSameMonth,
+  getDay,
 } from 'date-fns';
+import { TbCaretDownFilled } from 'react-icons/tb';
 
-export default function Calendar({ startWeek }) {
+import { getUserInfo } from '../../lib/api/userApi';
+import happy from '../../img/happy.png';
+import MonthSelectModal from './MonthSelectModal';
+import Button from '../../components/shared/Button';
+
+export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [calendarDays, setCalendarDays] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { data } = useQuery({
+    queryKey: ['userInfo'],
+    queryFn: () => getUserInfo(),
+  });
+
+  const startWeek = data?.user?.startWeek;
 
   const daysOfWeek =
     startWeek === '일'
       ? ['일', '월', '화', '수', '목', '금', '토']
       : ['월', '화', '수', '목', '금', '토', '일'];
 
-  const yearRange = Array.from(
-    { length: 30 },
-    (_, i) => new Date().getFullYear() - i,
-  );
-
   useEffect(() => {
-    const start = startOfWeek(currentDate, {
+    const firstDayOfMonth = startOfMonth(currentDate);
+
+    const start = startOfWeek(firstDayOfMonth, {
       weekStartsOn: startWeek === '일' ? 0 : 1,
     });
 
     const end = endOfMonth(currentDate);
 
-    setCalendarDays(eachDayOfInterval({ start, end }));
+    const days = eachDayOfInterval({ start, end });
+
+    const currentMonthDays = days.filter(
+      (day) => isSameMonth(day, currentDate) || day >= firstDayOfMonth,
+    );
+
+    setCalendarDays(currentMonthDays);
   }, [currentDate, startWeek]);
 
-  function handleMonthChange(e) {
-    setCurrentDate(
-      new Date(getYear(currentDate), parseInt(e.target.value, 10), 1),
-    );
+  const emptyDays = Array(getDay(startOfMonth(currentDate))).fill(null);
+
+  function handleChangeCalendar() {
+    setIsModalOpen(true);
   }
 
-  function handleYearChange(e) {
-    setCurrentDate(
-      new Date(parseInt(e.target.value, 10), getMonth(currentDate), 1),
-    );
+  function handleConfirm(newDate) {
+    setCurrentDate(newDate);
+    setIsModalOpen(false);
   }
 
   return (
     <div>
-      <section>
-        <select value={getYear(currentDate)} onChange={handleYearChange}>
-          {yearRange.map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
-        <select value={getMonth(currentDate)} onChange={handleMonthChange}>
-          {[...Array(12).keys()].map((month) => (
-            <option key={month} value={month}>
-              {format(new Date(getYear(currentDate), month), 'MMMM')}
-            </option>
-          ))}
-        </select>
+      {isModalOpen && (
+        <MonthSelectModal
+          initialDate={currentDate}
+          onConfirm={handleConfirm}
+          closeModal={() => setIsModalOpen(false)}
+        />
+      )}
+      <section className="mb-5 flex flex-row justify-center">
+        <Button onClick={handleChangeCalendar}>
+          {getYear(currentDate)}년 {getMonth(currentDate) + 1}월
+          <TbCaretDownFilled className="ml-1" />
+        </Button>
       </section>
       <section className="grid grid-cols-7 gap-1">
         {daysOfWeek.map((day) => (
-          <div key={day} className="text-center">
+          <div key={day} className="font text-center text-xs">
             {day}
           </div>
         ))}
-        {calendarDays.map((day, index) => (
-          <div
-            key={index}
-            className={`text-center ${
-              format(day, 'MMMM') !== format(currentDate, 'MMMM')
-                ? 'text-gray-400'
-                : ''
-            }`}
-          >
-            {format(day, 'd')}
-          </div>
+        {emptyDays.map((_, index) => (
+          <div key={index}></div>
         ))}
+        {calendarDays.map((day) => {
+          if (!isSameMonth(day, currentDate)) {
+            return null;
+          }
+          return (
+            <div key={day} className="text-center text-xs">
+              <img src={happy} alt="happy" />
+              {format(day, 'd')}
+            </div>
+          );
+        })}
       </section>
     </div>
   );
